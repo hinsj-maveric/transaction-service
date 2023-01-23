@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class TransactionDto {
@@ -24,5 +24,5 @@ public class TransactionDto {
     @NotEmpty(message = "Enter CREDIT/DEBIT")
     private Type type;
 
-    private Date createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
