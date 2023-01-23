@@ -18,7 +18,7 @@ public class TransactionDto {
 
     @NotEmpty(message = "Please enter the amount")
     @Min(value = 0, message = "Amount cannot be less then 0")
-    private Number number;
+    private Number amount;
 
     @Enumerated(EnumType.STRING)
     @NotEmpty(message = "Enter CREDIT/DEBIT")
