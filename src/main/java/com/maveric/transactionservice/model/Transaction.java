@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Document(collation = "transaction")
@@ -23,5 +23,5 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    private Date createdAt = new Date();
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
