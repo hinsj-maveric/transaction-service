@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -25,6 +24,7 @@ public class TransactionServiceImpl implements TransactionService {
     DtoToModelConverter dtoToModelConverter;
 
     @Override
+
     public TransactionDto createTransaction(TransactionDto transactionDto, String accountId) {
         if (accountId.equals(transactionDto.getAccountId())) {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
@@ -47,6 +47,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionList.stream().map(transaction -> dtoToModelConverter.modelToDto(transaction)).toList();
     }
 
+    @Override
     public TransactionDto getTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
                 () -> new TransactionIdNotFoundException("Transaction id not available")
@@ -55,6 +56,18 @@ public class TransactionServiceImpl implements TransactionService {
             return dtoToModelConverter.modelToDto(transaction);
         } else {
             throw new AccountIdMismatchException("Account Id not available");
+        }
+    }
+
+    @Override
+    public void deleteTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException {
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+                () -> new TransactionIdNotFoundException("Transaction ID not available")
+        );
+        if(accountId.equals(transaction.getAccountId())) {
+            transactionRepository.deleteById(transactionId);
+        } else {
+            throw new AccountIdMismatchException("Account ID not available");
         }
     }
 }

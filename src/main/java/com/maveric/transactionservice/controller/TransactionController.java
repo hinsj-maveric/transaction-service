@@ -34,8 +34,16 @@ public class TransactionController {
     @GetMapping("/accounts/{accountId}/transactions/{transactionId}")
     public ResponseEntity<TransactionDto> getTransactionByAccountId(@PathVariable("accountId") String accountId,
                                                                     @PathVariable("transactionId") String transactionId)
-                                                                    throws TransactionIdNotFoundException, AccountIdMismatchException {
+            throws TransactionIdNotFoundException, AccountIdMismatchException {
         return new ResponseEntity<>(transactionService.getTransactionIdByAccountId(accountId, transactionId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/accounts/{accountId}/transactions/{transactionId}")
+    public ResponseEntity<String> deleteTransactionByAccountId(@PathVariable("accountId") String accountId,
+                                                                    @PathVariable("transactionId") String transactionId)
+                                                                    throws TransactionIdNotFoundException, AccountIdMismatchException {
+        transactionService.deleteTransactionIdByAccountId(accountId, transactionId);
+        return new ResponseEntity<>("Transaction deleted successfully", HttpStatus.OK);
     }
 
 }
