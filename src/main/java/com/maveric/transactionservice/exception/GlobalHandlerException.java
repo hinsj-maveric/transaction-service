@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalHandlerException {
+public class GlobalHandlerException extends Exception {
 
     @ExceptionHandler(AccountIdMismatchException.class)
     public ResponseEntity<ErrorDto> handleAccountIdMismatchException(AccountIdMismatchException e) {
