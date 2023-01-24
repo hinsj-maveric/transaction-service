@@ -32,6 +32,12 @@ public class GlobalHandlerException {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(TransactionIdNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleTransactionIdNotFoundException(TransactionIdNotFoundException e) {
+        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ErrorDto getError(String message , String code){
         ErrorDto error = new ErrorDto();
         error.setCode(code);
