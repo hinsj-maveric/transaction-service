@@ -7,7 +7,12 @@ import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
 import com.maveric.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -19,7 +24,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDto createTransaction(TransactionDto transactionDto, String accountId) {
-        if(accountId.equals(transactionDto.getAccountId())){
+        if (accountId.equals(transactionDto.getAccountId())) {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
             return dtoToModelConverter.modelToDto(transactionRepository.save(transaction));
         } else {
@@ -29,5 +34,14 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public List<TransactionDto> getTransactionByAccountId(int page, int pageSize, String accountId) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Transaction> transactionPage = transactionRepository.findTransactionByAccountId(pageable, accountId);
+
+        List<Transaction> transactionList = transactionPage.getContent();
+        return transactionList.stream().map(transaction -> dtoToModelConverter.modelToDto(transaction)).toList();
     }
 }
