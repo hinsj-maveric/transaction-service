@@ -21,14 +21,14 @@ public class TransactionServiceImpl implements TransactionService {
     DtoToModelConverter dtoToModelConverter;
 
     @Override
-    public TransactionDto getTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException {
+    public void deleteTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
-                () -> new TransactionIdNotFoundException("Transaction id not available")
+                () -> new TransactionIdNotFoundException("Transaction ID not available")
         );
         if(accountId.equals(transaction.getAccountId())) {
-            return dtoToModelConverter.modelToDto(transaction);
+            transactionRepository.deleteById(transactionId);
         } else {
-            throw new AccountIdMismatchException("Account Id not available");
+            throw new AccountIdMismatchException("Account ID not available");
         }
     }
 }

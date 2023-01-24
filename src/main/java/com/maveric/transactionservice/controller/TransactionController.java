@@ -1,6 +1,5 @@
 package com.maveric.transactionservice.controller;
 
-import com.maveric.transactionservice.dto.TransactionDto;
 import com.maveric.transactionservice.exception.AccountIdMismatchException;
 import com.maveric.transactionservice.exception.TransactionIdNotFoundException;
 import com.maveric.transactionservice.service.TransactionService;
@@ -15,11 +14,12 @@ public class TransactionController {
     @Autowired
     TransactionService transactionService;
 
-    @GetMapping("/accounts/{accountId}/transactions/{transactionId}")
-    public ResponseEntity<TransactionDto> getTransactionByAccountId(@PathVariable("accountId") String accountId,
+    @DeleteMapping("/accounts/{accountId}/transactions/{transactionId}")
+    public ResponseEntity<String> deleteTransactionByAccountId(@PathVariable("accountId") String accountId,
                                                                     @PathVariable("transactionId") String transactionId)
                                                                     throws TransactionIdNotFoundException, AccountIdMismatchException {
-        return new ResponseEntity<>(transactionService.getTransactionIdByAccountId(accountId, transactionId), HttpStatus.OK);
+        transactionService.deleteTransactionIdByAccountId(accountId, transactionId);
+        return new ResponseEntity<>("Transaction deleted successfully", HttpStatus.OK);
     }
 
 }
