@@ -1,6 +1,7 @@
 package com.maveric.transactionservice.controller;
 
 import com.maveric.transactionservice.dto.TransactionDto;
+import com.maveric.transactionservice.exception.AccountIdMismatchException;
 import com.maveric.transactionservice.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class TransactionController {
 
     @PostMapping("accounts/{accountId}/transactions")
     public ResponseEntity<TransactionDto> createUser(@PathVariable("accountId") String accountId,
-                                                     @Valid @RequestBody TransactionDto transactionDto){
+                                                     @Valid @RequestBody TransactionDto transactionDto) {
         return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
     }
 
