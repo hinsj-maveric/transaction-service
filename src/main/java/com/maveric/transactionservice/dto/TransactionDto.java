@@ -16,7 +16,7 @@ public class TransactionDto {
     @NotEmpty(message = "Please enter account ID")
     private String accountId;
 
-    @Min(value = 0, message = "Amount cannot be less then 0")
+    @Min(value = 1, message = "Amount cannot be less then 1")
     private Number amount;
 
     @Enumerated(EnumType.STRING)

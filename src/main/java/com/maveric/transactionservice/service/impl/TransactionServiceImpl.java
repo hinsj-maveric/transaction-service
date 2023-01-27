@@ -23,11 +23,7 @@ public class TransactionServiceImpl implements TransactionService {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
             return dtoToModelConverter.modelToDto(transactionRepository.save(transaction));
         } else {
-            try {
-                throw new AccountIdMismatchException("The account ID " + accountId + " mismatched with the provided data");
-            } catch (AccountIdMismatchException e) {
-                throw new RuntimeException(e);
-            }
+            throw new AccountIdMismatchException("The account ID " + accountId + " is not available");
         }
     }
 }
