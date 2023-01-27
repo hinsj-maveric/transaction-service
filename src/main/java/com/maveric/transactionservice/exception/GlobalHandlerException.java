@@ -13,14 +13,14 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(AccountIdMismatchException.class)
     public ResponseEntity<ErrorDto> handleAccountIdMismatchException(AccountIdMismatchException e) {
-        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.NOT_FOUND.value()));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TransactionIdNotFoundException.class)
     public ResponseEntity<ErrorDto> handleTransactionIdNotFoundException(TransactionIdNotFoundException e) {
-        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.NOT_FOUND.value()));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     private ErrorDto getError(String message , String code){
