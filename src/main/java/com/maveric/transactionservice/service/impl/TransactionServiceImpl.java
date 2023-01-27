@@ -30,7 +30,7 @@ public class TransactionServiceImpl implements TransactionService {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
             return dtoToModelConverter.modelToDto(transactionRepository.save(transaction));
         } else {
-            throw new AccountIdMismatchException("The account ID " + accountId + " mismatched with the provided data");
+            throw new AccountIdMismatchException("The account ID " + accountId + " is not available");
         }
     }
 
@@ -51,7 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(accountId.equals(transaction.getAccountId())) {
             return dtoToModelConverter.modelToDto(transaction);
         } else {
-            throw new AccountIdMismatchException("Account Id not available");
+            throw new AccountIdMismatchException("Account Id " + accountId + " not available");
         }
     }
 
@@ -63,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
         if(accountId.equals(transaction.getAccountId())) {
             transactionRepository.deleteById(transactionId);
         } else {
-            throw new AccountIdMismatchException("Account ID not available");
+            throw new AccountIdMismatchException("Account Id " + accountId + " not available");
         }
     }
 }
