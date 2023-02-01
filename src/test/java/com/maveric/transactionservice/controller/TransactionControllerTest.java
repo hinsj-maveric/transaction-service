@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 
 import static com.maveric.transactionservice.TransactionServiceApplicationTests.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;

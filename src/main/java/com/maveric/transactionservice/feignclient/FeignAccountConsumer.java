@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(value = "feign-account",url = "http://localhost:3010/api/v1/")
-public interface AccountConsumer {
+public interface FeignAccountConsumer {
     @GetMapping("customers/{customerId}/accounts/{accountId}")
     public AccountDto getAccount(@PathVariable("customerId") String customerId,
                                  @Valid @PathVariable("accountId") String accountId);

@@ -40,6 +40,12 @@ public class GlobalHandlerException extends Exception {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(TransactionAmountException.class)
+    public ResponseEntity<ErrorDto> handleTransactionAmountException(TransactionAmountException e) {
+        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.NOT_FOUND.value()));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(FeignException.NotFound.class)
     public ResponseEntity<ErrorDto> handleFeignExceptionNotFound(FeignException e, HttpServletResponse response) {
         String message = e.contentUTF8();
