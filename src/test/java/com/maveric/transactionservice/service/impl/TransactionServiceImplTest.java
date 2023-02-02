@@ -82,4 +82,14 @@ class TransactionServiceImplTest {
 
         verify(transactionRepository).deleteById("1234");
     }
+
+    @Test
+    void deleteAllTransactionsByAccountId() {
+        List<Transaction> transactionList = Arrays.asList(getTransaction(), getTransaction());
+        when(transactionRepository.deleteAllTransactionsByAccountId(anyString())).thenReturn(transactionList);
+
+        transactionService.deleteAllTransactionsByAccountId("maveric-1");
+
+        verify(transactionRepository).deleteAllTransactionsByAccountId("maveric-1");
+    }
 }

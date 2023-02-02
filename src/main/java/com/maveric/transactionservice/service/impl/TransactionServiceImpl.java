@@ -66,4 +66,9 @@ public class TransactionServiceImpl implements TransactionService {
             throw new AccountIdMismatchException("Account Id " + accountId + " not available");
         }
     }
+
+    @Override
+    public void deleteAllTransactionsByAccountId(String accountId) {
+        transactionRepository.deleteAllTransactionsByAccountId(accountId);
+    }
 }

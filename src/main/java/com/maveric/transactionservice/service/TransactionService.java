@@ -13,4 +13,6 @@ public interface TransactionService {
     TransactionDto getTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException;
 
     void deleteTransactionIdByAccountId(String accountId, String transactionId) throws TransactionIdNotFoundException, AccountIdMismatchException;
+
+    void deleteAllTransactionsByAccountId(String accountId);
 }

@@ -1,5 +1,6 @@
 package com.maveric.transactionservice.controller;
 
+import com.maveric.transactionservice.constant.MessageConstant;
 import com.maveric.transactionservice.constant.Type;
 import com.maveric.transactionservice.dto.AccountDto;
 import com.maveric.transactionservice.dto.BalanceDto;
@@ -10,12 +11,8 @@ import com.maveric.transactionservice.exception.TransactionIdNotFoundException;
 import com.maveric.transactionservice.feignclient.FeignAccountConsumer;
 import com.maveric.transactionservice.feignclient.FeignBalanaceConsumer;
 import com.maveric.transactionservice.service.TransactionService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,37 +35,36 @@ public class TransactionController {
     @PostMapping("accounts/{accountId}/transactions")
     public ResponseEntity<TransactionDto> createUser(@PathVariable("accountId") String accountId,
                                                      @Valid @RequestBody TransactionDto transactionDto,
-                                                     HttpServletRequest request) {
-        String customerId = (String) request.getHeader("userid");
-
-        if(customerId == null){
+                                                     @RequestHeader(value = "userid") String headerUserId) {
+        if(headerUserId == null){
             return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
         }
         else{
-            AccountDto accountDto = feignAccountConsumer.getAccount(customerId, accountId);
+            AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
             if(accountDto.get_id().equals(transactionDto.getAccountId())){
-                List<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(0, 2, accountId);
+                List<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(0, 2,
+                        accountId, headerUserId);
                 BalanceDto currentUserBalance = balanceDto.get(0);
                 Number newBalance;
                 Number transactionAmount = transactionDto.getAmount();
-                Number balanceAmount = (Number) currentUserBalance.getAmount();
+                Number balanceAmount = currentUserBalance.getAmount();
 
                 if(transactionDto.getType().equals(Type.DEBIT) && (transactionAmount.doubleValue() < balanceAmount.doubleValue())) {
                     newBalance = balanceAmount.doubleValue() - transactionAmount.doubleValue();
                     currentUserBalance.setAmount(newBalance);
-                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id());
+                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
                     return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
                 } else if (transactionDto.getType().equals(Type.CREDIT)) {
                     newBalance = balanceAmount.doubleValue() + transactionAmount.doubleValue();
                     currentUserBalance.setAmount(newBalance);
-                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id());
+                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
                     return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
                 } else {
-                    throw new TransactionAmountException("Transaction amount is more than Balance amount");
+                    throw new TransactionAmountException("Insufficient balance");
                 }
             }
             else {
-                throw new AccountIdMismatchException("Account ID " + accountId + " is not available for customer " + customerId);
+                throw new AccountIdMismatchException("Account ID " + accountId + " is not available for customer");
             }
         }
     }
@@ -76,23 +72,58 @@ public class TransactionController {
     @GetMapping("/accounts/{accountId}/transactions")
     public List<TransactionDto> getAllTransactionByAccountId(@RequestParam(value = "page", defaultValue = "0", required = false) int page,
                                                              @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
-                                                             @PathVariable("accountId") String accountId) {
-        return transactionService.getTransactionByAccountId(page, pageSize, accountId);
+                                                             @PathVariable("accountId") String accountId,
+                                                             @RequestHeader(value = "userid") String headerUserId) {
+        AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
+        if(accountDto != null) {
+            return transactionService.getTransactionByAccountId(page, pageSize, accountId);
+        }
+        else {
+            throw new AccountIdMismatchException(MessageConstant.NOT_AUTHORIZED_USER);
+        }
     }
 
     @GetMapping("/accounts/{accountId}/transactions/{transactionId}")
     public ResponseEntity<TransactionDto> getTransactionByAccountId(@PathVariable("accountId") String accountId,
-                                                                    @PathVariable("transactionId") String transactionId)
+                                                                    @PathVariable("transactionId") String transactionId,
+                                                                    @RequestHeader(value = "userid") String headerUserId)
             throws TransactionIdNotFoundException, AccountIdMismatchException {
-        return new ResponseEntity<>(transactionService.getTransactionIdByAccountId(accountId, transactionId), HttpStatus.OK);
+        AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
+        if(accountDto != null) {
+            return new ResponseEntity<>(transactionService.getTransactionIdByAccountId(accountId, transactionId), HttpStatus.OK);
+        }
+        else {
+            throw new AccountIdMismatchException(MessageConstant.NOT_AUTHORIZED_USER);
+        }
     }
 
     @DeleteMapping("/accounts/{accountId}/transactions/{transactionId}")
     public ResponseEntity<String> deleteTransactionByAccountId(@PathVariable("accountId") String accountId,
-                                                                    @PathVariable("transactionId") String transactionId)
-                                                                    throws TransactionIdNotFoundException, AccountIdMismatchException {
-        transactionService.deleteTransactionIdByAccountId(accountId, transactionId);
-        return new ResponseEntity<>("Transaction deleted successfully", HttpStatus.OK);
+                                                               @PathVariable("transactionId") String transactionId,
+                                                               @RequestHeader(value = "userid") String headerUserId)
+            throws TransactionIdNotFoundException, AccountIdMismatchException {
+        AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
+        if(accountDto != null) {
+            transactionService.deleteTransactionIdByAccountId(accountId, transactionId);
+            return new ResponseEntity<>("Transaction deleted successfully", HttpStatus.OK);
+        }
+        else {
+            throw new AccountIdMismatchException(MessageConstant.NOT_AUTHORIZED_USER);
+        }
+    }
+
+    @DeleteMapping("/accounts/{accountId}/transactions")
+    public ResponseEntity<String> deleteAllTransactionsByAccountId(@PathVariable("accountId") String accountId,
+                                                               @RequestHeader(value = "userid") String headerUserId)
+            throws AccountIdMismatchException {
+        AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
+        if(accountDto != null) {
+            transactionService.deleteAllTransactionsByAccountId(accountId);
+            return new ResponseEntity<>("Transactions deleted successfully", HttpStatus.OK);
+        }
+        else {
+            throw new AccountIdMismatchException(MessageConstant.NOT_AUTHORIZED_USER);
+        }
     }
 
 }

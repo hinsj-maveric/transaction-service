@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class GlobalHandlerException extends Exception {
@@ -32,6 +33,12 @@ public class GlobalHandlerException extends Exception {
     public ResponseEntity<ErrorDto> handleFormatException(HttpMessageNotReadableException e) {
         ErrorDto error = getError(MessageConstant.TYPE_ERROR, String.valueOf(HttpStatus.BAD_REQUEST));
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorDto> nphandlerFoundException(NoHandlerFoundException e) {
+        ErrorDto error = getError(e.getMessage(), String.valueOf(HttpStatus.NOT_FOUND.value()));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(TransactionIdNotFoundException.class)

@@ -1,6 +1,8 @@
 package com.maveric.transactionservice;
 
+import com.maveric.transactionservice.constant.AccountType;
 import com.maveric.transactionservice.constant.Type;
+import com.maveric.transactionservice.dto.AccountDto;
 import com.maveric.transactionservice.dto.TransactionDto;
 import com.maveric.transactionservice.model.Transaction;
 import org.junit.jupiter.api.Test;
@@ -55,6 +57,14 @@ class TransactionServiceApplicationTests {
 		transactionDto.setAmount(872.32);
 		transactionDto.setCreatedAt(LocalDateTime.now());
 		return transactionDto;
+	}
+
+	public static AccountDto getAccountDto(){
+		AccountDto accountDto = new AccountDto();
+		accountDto.set_id("1234");
+		accountDto.setCustomerId("1234");
+		accountDto.setType(AccountType.CURRENT);
+		return accountDto;
 	}
 
 }
