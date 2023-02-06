@@ -36,36 +36,31 @@ public class TransactionController {
     public ResponseEntity<TransactionDto> createUser(@PathVariable("accountId") String accountId,
                                                      @Valid @RequestBody TransactionDto transactionDto,
                                                      @RequestHeader(value = "userid") String headerUserId) {
-        if(headerUserId == null){
-            return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
-        }
-        else{
-            AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
-            if(accountDto.get_id().equals(transactionDto.getAccountId())){
-                List<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(0, 2,
-                        accountId, headerUserId);
-                BalanceDto currentUserBalance = balanceDto.get(0);
-                Number newBalance;
-                Number transactionAmount = transactionDto.getAmount();
-                Number balanceAmount = currentUserBalance.getAmount();
+        AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
+        if(accountDto.get_id().equals(transactionDto.getAccountId())){
+            List<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(0, 2,
+                    accountId, headerUserId);
+            BalanceDto currentUserBalance = balanceDto.get(0);
+            Number newBalance;
+            Number transactionAmount = transactionDto.getAmount();
+            Number balanceAmount = currentUserBalance.getAmount();
 
-                if(transactionDto.getType().equals(Type.DEBIT) && (transactionAmount.doubleValue() < balanceAmount.doubleValue())) {
-                    newBalance = balanceAmount.doubleValue() - transactionAmount.doubleValue();
-                    currentUserBalance.setAmount(newBalance);
-                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
-                    return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
-                } else if (transactionDto.getType().equals(Type.CREDIT)) {
-                    newBalance = balanceAmount.doubleValue() + transactionAmount.doubleValue();
-                    currentUserBalance.setAmount(newBalance);
-                    feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
-                    return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
-                } else {
-                    throw new TransactionAmountException("Insufficient balance");
-                }
+            if(transactionDto.getType().equals(Type.DEBIT) && (transactionAmount.doubleValue() < balanceAmount.doubleValue())) {
+                newBalance = balanceAmount.doubleValue() - transactionAmount.doubleValue();
+                currentUserBalance.setAmount(newBalance);
+                feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
+                return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
+            } else if (transactionDto.getType().equals(Type.CREDIT)) {
+                newBalance = balanceAmount.doubleValue() + transactionAmount.doubleValue();
+                currentUserBalance.setAmount(newBalance);
+                feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
+                return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
+            } else {
+                throw new TransactionAmountException("Insufficient balance");
             }
-            else {
-                throw new AccountIdMismatchException("Account ID " + accountId + " is not available for customer");
-            }
+        }
+        else {
+            throw new AccountIdMismatchException("Account ID " + accountId + " is not available for customer");
         }
     }
 
