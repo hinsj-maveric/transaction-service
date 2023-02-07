@@ -38,9 +38,8 @@ public class TransactionController {
                                                      @RequestHeader(value = "userid") String headerUserId) {
         AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
         if(accountDto.get_id().equals(transactionDto.getAccountId())){
-            List<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(0, 2,
-                    accountId, headerUserId);
-            BalanceDto currentUserBalance = balanceDto.get(0);
+            ResponseEntity<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(accountId, headerUserId);
+            BalanceDto currentUserBalance = balanceDto.getBody();
             Number newBalance;
             Number transactionAmount = transactionDto.getAmount();
             Number balanceAmount = currentUserBalance.getAmount();

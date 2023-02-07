@@ -17,10 +17,8 @@ public interface FeignBalanaceConsumer {
                                                             @RequestHeader(value = "userid") String headerUserId);
 
     @GetMapping("accounts/{accountId}/balances")
-    public List<BalanceDto> getAllBalanceByAccountId(@RequestParam(value = "page", defaultValue = "0", required = false) int page,
-                                                     @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
-                                                     @PathVariable("accountId") @Valid String accountId,
-                                                     @RequestHeader(value = "userid") String headerUserId);
+    public ResponseEntity<BalanceDto> getAllBalanceByAccountId(@PathVariable("accountId") @Valid String accountId,
+                                                               @RequestHeader(value = "userid") String headerUserId);
 
     @PutMapping("/accounts/{accountId}/balances/{balanceId}")
     public ResponseEntity<BalanceDto> updateBalance(@Valid @RequestBody BalanceDto balanceDto,
