@@ -22,7 +22,7 @@ class TransactionServiceApplicationTests {
 		Transaction transaction = new Transaction();
 		transaction.set_id("1234");
 		transaction.setType(Type.CREDIT);
-		transaction.setAccountId("maveric-1");
+		transaction.setAccountId("1234");
 		transaction.setAmount(872.32);
 		transaction.setCreatedAt(LocalDateTime.now());
 		return transaction;
@@ -32,7 +32,7 @@ class TransactionServiceApplicationTests {
 		Transaction transaction = new Transaction();
 		transaction.set_id("1234");
 		transaction.setType(Type.CREDIT);
-		transaction.setAccountId("maveric-1");
+		transaction.setAccountId("1234");
 		transaction.setAmount(-1);
 		transaction.setCreatedAt(LocalDateTime.now());
 		return transaction;
@@ -53,7 +53,7 @@ class TransactionServiceApplicationTests {
 		TransactionDto transactionDto = new TransactionDto();
 		transactionDto.set_id("1234");
 		transactionDto.setType(Type.CREDIT);
-		transactionDto.setAccountId("maveric-1");
+		transactionDto.setAccountId("1234");
 		transactionDto.setAmount(872.32);
 		transactionDto.setCreatedAt(LocalDateTime.now());
 		return transactionDto;

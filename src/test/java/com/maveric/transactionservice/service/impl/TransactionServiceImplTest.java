@@ -50,6 +50,18 @@ class TransactionServiceImplTest {
     }
 
     @Test
+    void ShouldThrowErrorWhenCreateTransaction() {
+        Exception exception = assertThrows(AccountIdMismatchException.class,
+                ()->{transactionService.createTransaction(getTransactionDto(), "123");}
+        );
+
+        String expectedMessage = "The account ID 123 is not available";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void getTransactionByAccountId() {
         Page<Transaction> page = new PageImpl<>(Arrays.asList(getTransaction(), getTransaction()));
         when(transactionRepository.findTransactionByAccountId(any(Pageable.class), any())).thenReturn(page);
@@ -57,10 +69,10 @@ class TransactionServiceImplTest {
 
         List<TransactionDto> transactionDtos = transactionService.getTransactionByAccountId(0,
                 2,
-                "maveric-1");
+                "1234");
 
         assertNotNull(transactionDtos);
-        assertEquals("maveric-1", transactionDtos.get(0).getAccountId());
+        assertEquals("1234", transactionDtos.get(0).getAccountId());
     }
 
     @Test
@@ -68,7 +80,7 @@ class TransactionServiceImplTest {
         when(transactionRepository.findById(anyString())).thenReturn(Optional.of(getTransaction()));
         when(dtoToModelConverter.modelToDto(any(Transaction.class))).thenReturn(getTransactionDto());
 
-        TransactionDto transactionDto = transactionService.getTransactionIdByAccountId("maveric-1", "1234");
+        TransactionDto transactionDto = transactionService.getTransactionIdByAccountId("1234", "1234");
         assertNotNull(transactionDto);
         assertSame(transactionDto.getType(), getTransaction().getType());
     }
@@ -78,7 +90,7 @@ class TransactionServiceImplTest {
         when(transactionRepository.findById(anyString())).thenReturn(Optional.of(getTransaction()));
         willDoNothing().given(transactionRepository).deleteById(anyString());
 
-        transactionService.deleteTransactionIdByAccountId("maveric-1", "1234");
+        transactionService.deleteTransactionIdByAccountId("1234", "1234");
 
         verify(transactionRepository).deleteById("1234");
     }
@@ -88,8 +100,8 @@ class TransactionServiceImplTest {
         List<Transaction> transactionList = Arrays.asList(getTransaction(), getTransaction());
         when(transactionRepository.deleteAllTransactionsByAccountId(anyString())).thenReturn(transactionList);
 
-        transactionService.deleteAllTransactionsByAccountId("maveric-1");
+        transactionService.deleteAllTransactionsByAccountId("1234");
 
-        verify(transactionRepository).deleteAllTransactionsByAccountId("maveric-1");
+        verify(transactionRepository).deleteAllTransactionsByAccountId("1234");
     }
 }
