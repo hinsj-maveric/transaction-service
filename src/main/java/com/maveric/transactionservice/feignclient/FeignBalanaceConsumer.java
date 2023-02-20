@@ -8,19 +8,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "feign-balance",url = "http://localhost:3015/api/v1/")
+@FeignClient(value = "balance-service")
 public interface FeignBalanaceConsumer {
 
-    @GetMapping("accounts/{accountId}/balances/{balanceId}")
+    @GetMapping("api/v1/accounts/{accountId}/balances/{balanceId}")
     public ResponseEntity<BalanceDto> getBalanceByAccountId(@PathVariable("accountId") String accountId,
                                                             @PathVariable("balanceId") String balanceId,
                                                             @RequestHeader(value = "userid") String headerUserId);
 
-    @GetMapping("accounts/{accountId}/balances")
+    @GetMapping("api/v1/accounts/{accountId}/balances")
     public ResponseEntity<BalanceDto> getAllBalanceByAccountId(@PathVariable("accountId") @Valid String accountId,
                                                                @RequestHeader(value = "userid") String headerUserId);
 
-    @PutMapping("/accounts/{accountId}/balances/{balanceId}")
+    @PutMapping("api/v1/accounts/{accountId}/balances/{balanceId}")
     public ResponseEntity<BalanceDto> updateBalance(@Valid @RequestBody BalanceDto balanceDto,
                                                     @PathVariable String accountId, @PathVariable String balanceId,
                                                     @RequestHeader(value = "userid") String headerUserId);
