@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,10 +24,10 @@ public class ExceptionTest {
     @InjectMocks
     GlobalHandlerException globalHandlerException;
 
-    @InjectMocks
+    @MockBean
     FeignBalanaceConsumer feignBalanaceConsumer;
 
-    @InjectMocks
+    @MockBean
     FeignAccountConsumer feignAccountConsumer;
 
     @Test
