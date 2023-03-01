@@ -7,6 +7,8 @@ import com.maveric.transactionservice.exception.TransactionIdNotFoundException;
 import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
 import com.maveric.transactionservice.service.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,13 +25,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     DtoToModelConverter dtoToModelConverter;
 
-    @Override
+    private static final Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
+    @Override
     public TransactionDto createTransaction(TransactionDto transactionDto, String accountId) {
         if (accountId.equals(transactionDto.getAccountId())) {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
+            logger.info("New transaction created for account id " + accountId);
             return dtoToModelConverter.modelToDto(transactionRepository.save(transaction));
         } else {
+            logger.info("Account Id not found");
             throw new AccountIdMismatchException("The account ID " + accountId + " is not available");
         }
     }
@@ -40,6 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactionPage = transactionRepository.findTransactionByAccountId(pageable, accountId);
 
         List<Transaction> transactionList = transactionPage.getContent();
+        logger.info("Getting list of transaction for account id " + accountId);
         return transactionList.stream().map(transaction -> dtoToModelConverter.modelToDto(transaction)).toList();
     }
 
@@ -49,8 +55,10 @@ public class TransactionServiceImpl implements TransactionService {
                 () -> new TransactionIdNotFoundException("Transaction id not available")
         );
         if(accountId.equals(transaction.getAccountId())) {
+            logger.info("Returning transaction for transaction id");
             return dtoToModelConverter.modelToDto(transaction);
         } else {
+            logger.info("Account Id not available");
             throw new AccountIdMismatchException("Account Id " + accountId + " not available");
         }
     }
@@ -61,6 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
                 () -> new TransactionIdNotFoundException("Transaction ID not available")
         );
         if(accountId.equals(transaction.getAccountId())) {
+            logger.info("Transaction deleted");
             transactionRepository.deleteById(transactionId);
         } else {
             throw new AccountIdMismatchException("Account Id " + accountId + " not available");
@@ -69,6 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void deleteAllTransactionsByAccountId(String accountId) {
+        logger.info("All transactions deleted");
         transactionRepository.deleteAllTransactionsByAccountId(accountId);
     }
 }

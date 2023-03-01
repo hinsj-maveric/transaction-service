@@ -11,7 +11,10 @@ import com.maveric.transactionservice.exception.TransactionIdNotFoundException;
 import com.maveric.transactionservice.feignclient.FeignAccountConsumer;
 import com.maveric.transactionservice.feignclient.FeignBalanaceConsumer;
 import com.maveric.transactionservice.service.TransactionService;
+import com.maveric.transactionservice.service.impl.TransactionServiceImpl;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,8 @@ public class TransactionController {
     @Autowired
     FeignAccountConsumer feignAccountConsumer;
 
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
 
     @PostMapping("accounts/{accountId}/transactions")
     public ResponseEntity<TransactionDto> createUser(@PathVariable("accountId") String accountId,
@@ -39,6 +44,7 @@ public class TransactionController {
         AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
         if(accountDto.get_id().equals(transactionDto.getAccountId())){
             ResponseEntity<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(accountId, headerUserId);
+            logger.info("Returning list of balance for account id " + accountId);
             BalanceDto currentUserBalance = balanceDto.getBody();
             Number newBalance;
             Number transactionAmount = transactionDto.getAmount();
@@ -48,13 +54,16 @@ public class TransactionController {
                 newBalance = balanceAmount.doubleValue() - transactionAmount.doubleValue();
                 currentUserBalance.setAmount(newBalance);
                 feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
+                logger.info("Amount debited");
                 return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
             } else if (transactionDto.getType().equals(Type.CREDIT)) {
                 newBalance = balanceAmount.doubleValue() + transactionAmount.doubleValue();
                 currentUserBalance.setAmount(newBalance);
                 feignBalanaceConsumer.updateBalance(currentUserBalance, accountId, currentUserBalance.get_id(), headerUserId);
+                logger.info("Amount credited");
                 return new ResponseEntity<>(transactionService.createTransaction(transactionDto, accountId), HttpStatus.CREATED);
             } else {
+                logger.info("Insufficient balance");
                 throw new TransactionAmountException("Insufficient balance");
             }
         }

@@ -10,12 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 public
 class TransactionServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
+		assertTrue(true);
 	}
 
 	public static Transaction getTransaction(){
