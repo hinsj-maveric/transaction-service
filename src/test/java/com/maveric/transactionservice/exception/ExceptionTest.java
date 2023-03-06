@@ -19,7 +19,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class ExceptionTest {
+class ExceptionTest {
 
     @InjectMocks
     GlobalHandlerException globalHandlerException;

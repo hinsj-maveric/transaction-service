@@ -104,4 +104,34 @@ class TransactionServiceImplTest {
 
         verify(transactionRepository).deleteAllTransactionsByAccountId("1234");
     }
+
+    @Test
+    void throwErrorWhenTransactionIdNotFoundForDeleteTransaction(){
+        Throwable error = assertThrows(TransactionIdNotFoundException.class,
+                ()->transactionService.deleteTransactionIdByAccountId("1234", "1L"));
+        assertEquals("Transaction ID not available",error.getMessage());
+    }
+
+    @Test
+    void throwErrorWhenAccountIdNotFoundForDeleteTransaction(){
+        when(transactionRepository.findById(anyString())).thenReturn(Optional.of(getTransaction()));
+        Throwable error = assertThrows(AccountIdMismatchException.class,
+                ()->transactionService.deleteTransactionIdByAccountId("1L", "1L"));
+        assertEquals("Account Id 1L not available",error.getMessage());
+    }
+
+    @Test
+    void throwErrorWhenTransactionIdNotFoundForGetTransactionIdByAccountId(){
+        Throwable error = assertThrows(TransactionIdNotFoundException.class,
+                ()->transactionService.getTransactionIdByAccountId("1234", "1L"));
+        assertEquals("Transaction id not available",error.getMessage());
+    }
+
+    @Test
+    void throwErrorWhenAccountIdNotFoundForGetTransactionIdByAccountId(){
+        when(transactionRepository.findById(anyString())).thenReturn(Optional.of(getTransaction()));
+        Throwable error = assertThrows(AccountIdMismatchException.class,
+                ()->transactionService.getTransactionIdByAccountId("1L", "1L"));
+        assertEquals("Account Id 1L not available",error.getMessage());
+    }
 }

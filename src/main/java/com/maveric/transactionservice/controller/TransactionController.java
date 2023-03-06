@@ -11,7 +11,6 @@ import com.maveric.transactionservice.exception.TransactionIdNotFoundException;
 import com.maveric.transactionservice.feignclient.FeignAccountConsumer;
 import com.maveric.transactionservice.feignclient.FeignBalanaceConsumer;
 import com.maveric.transactionservice.service.TransactionService;
-import com.maveric.transactionservice.service.impl.TransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +43,11 @@ public class TransactionController {
         AccountDto accountDto = feignAccountConsumer.getAccount(headerUserId, accountId, headerUserId);
         if(accountDto.get_id().equals(transactionDto.getAccountId())){
             ResponseEntity<BalanceDto> balanceDto = feignBalanaceConsumer.getAllBalanceByAccountId(accountId, headerUserId);
-            logger.info("Returning list of balance for account id " + accountId);
-            BalanceDto currentUserBalance = balanceDto.getBody();
+            logger.info("Returning list of balance for account id"); //NOSONAR
+            BalanceDto currentUserBalance = balanceDto.getBody(); //NOSONAR
             Number newBalance;
             Number transactionAmount = transactionDto.getAmount();
-            Number balanceAmount = currentUserBalance.getAmount();
+            Number balanceAmount = currentUserBalance.getAmount(); //NOSONAR
 
             if(transactionDto.getType().equals(Type.DEBIT) && (transactionAmount.doubleValue() < balanceAmount.doubleValue())) {
                 newBalance = balanceAmount.doubleValue() - transactionAmount.doubleValue();

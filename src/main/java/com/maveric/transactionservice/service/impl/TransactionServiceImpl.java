@@ -31,7 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto createTransaction(TransactionDto transactionDto, String accountId) {
         if (accountId.equals(transactionDto.getAccountId())) {
             Transaction transaction = dtoToModelConverter.dtoToModel(transactionDto);
-            logger.info("New transaction created for account id " + accountId);
+            logger.info("New transaction created for account id");
             return dtoToModelConverter.modelToDto(transactionRepository.save(transaction));
         } else {
             logger.info("Account Id not found");
@@ -45,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactionPage = transactionRepository.findTransactionByAccountId(pageable, accountId);
 
         List<Transaction> transactionList = transactionPage.getContent();
-        logger.info("Getting list of transaction for account id " + accountId);
+        logger.info("Getting list of transaction for account id");
         return transactionList.stream().map(transaction -> dtoToModelConverter.modelToDto(transaction)).toList();
     }
 
